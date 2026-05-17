@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+message ChatMessage {
+  reserved 1; // Reserved for possible future type field
+  string sender = 2;
+  string content = 3;
+  bytes signature = 4;
+}
+message KeyExchange {
+  reserved 1; // Reserved for possible future type field
+  bytes key_ct = 2;
+  bytes vine_ct = 3;
+}
