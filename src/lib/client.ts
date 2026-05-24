@@ -2,12 +2,7 @@ import { createDB, openDB } from './db';
 import { ml_kem1024 } from '@noble/post-quantum/ml-kem.js';
 import * as proto from './proto';
 const vines = new Map<string, Uint8Array>();
-vines.set('key', new Uint8Array(32));
-export async function wst() {
-	const chat = openChat('key', (message) => console.log(message));
-	await chat.send('Hello!');
-	//console.log(new TextDecoder().decode((await db.get(0, 0))[0]));
-}
+vines.set('key', new Uint8Array(32)); //INSECURE
 /**
  * getChats returns the user's chat(s)
  */
@@ -27,22 +22,22 @@ export function getChats(): Chat {
  * @param id
  * @param callback
  */
-export function openChat(
+export async function openChat(
 	id: string,
 	callback: (x: ChatMessage) => void
-): { history: () => Promise<ChatMessage>; send: (m: string) => Promise<void> } {
+): Promise<{ history: () => Promise<ChatMessage>; send: (m: string) => Promise<void> }> {
 	const key = vines.get(id);
 	if (key === undefined) {
 		throw new Error('VINE LOOKUP FAIL');
 	}
 	const db = openDB(key);
-	db.listen((message) => callback(proto.ChatMessage.decode(message))); // THIS DOES NOT CHECK SIGNATURES AND IS THEREFORE DEEPLY INSECURE
+	await db.listen((message) => callback(proto.ChatMessage.decode(message))); // THIS DOES NOT CHECK SIGNATURES AND IS THEREFORE DEEPLY INSECURE
 	return {
 		history: async () => {
 			return {
-				sender: 'bob',
-				content: 'john',
-				signature: new Uint8Array()
+				sender: 'PLACEHOLDER',
+				content: 'Lorem Lorem Lorem Ipsum',
+				signature: new Uint8Array([])
 			};
 		},
 		send: async (message) => {

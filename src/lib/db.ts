@@ -1,4 +1,4 @@
-const BASE_URL = 'https://lo.jos.onl';
+const BASE_URL = 'https://localhost';
 import { xchacha20poly1305 } from '@noble/ciphers/chacha.js';
 import { randomBytes, managedNonce } from '@noble/ciphers/utils.js';
 import { sha256 } from '@noble/hashes/sha2.js';
@@ -65,7 +65,16 @@ export function openDB(key: Uint8Array) {
 		 * @param callback
 		 */
 		listen: async (callback: (message: Uint8Array) => void) => {
-			const transport = new WebTransport(`${BASE_URL}:4433/msg/${id}`);
+			const transport = new WebTransport(`${BASE_URL}:4433/${id}`, {
+				serverCertificateHashes: [
+					{
+						algorithm: 'sha-256',
+						value: Uint8Array.fromHex(
+							'34623a61393a38353a65333a61643a62383a31363a65393a30383a33313a37653a31373a65383a63323a38633a38373a64633a38353a62343a62633a66353a38663a34623a34353a30333a32343a32323a63323a35303a31333a64623a3862'
+						).buffer
+					}
+				]
+			});
 			await transport.ready;
 			const reader = transport.incomingUnidirectionalStreams.getReader();
 			try {
@@ -97,7 +106,7 @@ export function openDB(key: Uint8Array) {
 	};
 }
 export async function createDB() {
-	const db = await openDB(randomBytes(32));
+	const db = openDB(randomBytes(32));
 	let perms = {
 		owner: {
 			id: ''

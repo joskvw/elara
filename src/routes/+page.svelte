@@ -2,8 +2,13 @@
 	import { browser } from '$app/environment';
 	import ChatElement from '$lib/ChatElement.svelte';
 	import MessagesElement from '$lib/MessagesElement.svelte';
-	import { getChats, wst } from '$lib/client';
-	if (browser) wst();
+	import { getChats, openChat } from '$lib/client';
+	(async () => {
+		const chat = await openChat('key', (message) => console.log(message));
+		setInterval(async () => {
+			await chat.send('Hello!');
+		}, 250);
+	})();
 </script>
 
 <div class="z-0 flex h-screen bg-olive-950 font-mono text-olive-200">
